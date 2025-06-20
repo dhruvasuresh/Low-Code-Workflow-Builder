@@ -6,14 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/workflows/{workflowId}/steps")
@@ -40,18 +35,7 @@ public class WorkflowStepController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> listSteps(
-            @PathVariable Long workflowId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<WorkflowStepDto> stepPage = stepService.listSteps(workflowId, pageable);
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", stepPage.getContent());
-        response.put("page", stepPage.getNumber());
-        response.put("size", stepPage.getSize());
-        response.put("totalElements", stepPage.getTotalElements());
-        response.put("totalPages", stepPage.getTotalPages());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<WorkflowStepDto>> listSteps(@PathVariable Long workflowId) {
+        return ResponseEntity.ok(stepService.listSteps(workflowId));
     }
 } 

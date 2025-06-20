@@ -4,10 +4,12 @@ com\lowcode\userservice\dto\UserRegisterRequest.class
 com\lowcode\userservice\security\SecurityConfig.class
 com\lowcode\userservice\exception\GlobalExceptionHandler.class
 com\lowcode\userservice\security\JwtAuthenticationFilter.class
+com\lowcode\userservice\exception\ErrorResponse.class
 com\lowcode\userservice\UserServiceApplication.class
 com\lowcode\userservice\security\JwtUtil.class
 com\lowcode\userservice\service\UserService.class
 com\lowcode\userservice\domain\User.class
 com\lowcode\userservice\controller\AuthController.class
+com\lowcode\userservice\exception\ResourceNotFoundException.class
 com\lowcode\userservice\repository\UserRepository.class
 com\lowcode\userservice\dto\UserLoginRequest.class

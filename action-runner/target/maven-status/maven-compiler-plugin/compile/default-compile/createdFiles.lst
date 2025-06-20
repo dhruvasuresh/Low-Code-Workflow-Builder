@@ -1,6 +1,9 @@
+com\lowcode\actionrunner\exception\ResourceNotFoundException.class
 com\lowcode\actionrunner\controller\ActionController.class
+com\lowcode\actionrunner\exception\GlobalExceptionHandler.class
 com\lowcode\actionrunner\security\SecurityConfig.class
 com\lowcode\actionrunner\ActionRunnerApplication.class
 com\lowcode\actionrunner\security\JwtAuthenticationFilter.class
 com\lowcode\actionrunner\security\JwtUtil.class
+com\lowcode\actionrunner\exception\ErrorResponse.class
 com\lowcode\actionrunner\controller\ActionController$ActionRequest.class

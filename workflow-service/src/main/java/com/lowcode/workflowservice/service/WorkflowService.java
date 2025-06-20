@@ -10,8 +10,6 @@ import com.lowcode.workflowservice.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,10 +70,6 @@ public class WorkflowService {
         dto.setStartedAt(execution.getStartedAt());
         dto.setEndedAt(execution.getEndedAt());
         return dto;
-    }
-
-    public Page<WorkflowDto> getAllWorkflows(Pageable pageable) {
-        return workflowRepository.findAll(pageable).map(this::toDto);
     }
 
     private WorkflowDto toDto(Workflow workflow) {

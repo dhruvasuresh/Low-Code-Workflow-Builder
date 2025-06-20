@@ -8,14 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/workflows")
@@ -30,18 +25,8 @@ public class WorkflowController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllWorkflows(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<WorkflowDto> workflowPage = workflowService.getAllWorkflows(pageable);
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", workflowPage.getContent());
-        response.put("page", workflowPage.getNumber());
-        response.put("size", workflowPage.getSize());
-        response.put("totalElements", workflowPage.getTotalElements());
-        response.put("totalPages", workflowPage.getTotalPages());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<WorkflowDto>> getAllWorkflows() {
+        return ResponseEntity.ok(workflowService.getAllWorkflows());
     }
 
     @GetMapping("/{id}")
