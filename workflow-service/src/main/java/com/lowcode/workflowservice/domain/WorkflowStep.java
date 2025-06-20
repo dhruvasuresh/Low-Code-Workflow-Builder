@@ -2,6 +2,9 @@ package com.lowcode.workflowservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import java.util.Map;
 
 @Entity
 @Table(name = "workflow_step")
@@ -25,5 +28,6 @@ public class WorkflowStep {
     private String actionType;
 
     @Column(columnDefinition = "jsonb")
-    private String config;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> config;
 } 

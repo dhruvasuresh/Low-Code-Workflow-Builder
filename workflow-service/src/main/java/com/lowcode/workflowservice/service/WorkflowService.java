@@ -1,8 +1,11 @@
 package com.lowcode.workflowservice.service;
 
 import com.lowcode.workflowservice.domain.Workflow;
+import com.lowcode.workflowservice.domain.WorkflowExecution;
 import com.lowcode.workflowservice.dto.WorkflowDto;
+import com.lowcode.workflowservice.dto.WorkflowExecutionDto;
 import com.lowcode.workflowservice.repository.WorkflowRepository;
+import com.lowcode.workflowservice.repository.WorkflowExecutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
+    private final WorkflowExecutionRepository workflowExecutionRepository;
 
     public WorkflowDto createWorkflow(WorkflowDto dto) {
         Workflow workflow = new Workflow();
@@ -46,6 +50,24 @@ public class WorkflowService {
 
     public void deleteWorkflow(Long id) {
         workflowRepository.deleteById(id);
+    }
+
+    public WorkflowExecutionDto createWorkflowExecution(Long workflowId) {
+        Workflow workflow = workflowRepository.findById(workflowId)
+                .orElseThrow(() -> new RuntimeException("Workflow not found"));
+        WorkflowExecution execution = WorkflowExecution.builder()
+                .workflow(workflow)
+                .status("PENDING")
+                .startedAt(java.time.LocalDateTime.now())
+                .build();
+        execution = workflowExecutionRepository.save(execution);
+        WorkflowExecutionDto dto = new WorkflowExecutionDto();
+        dto.setId(execution.getId());
+        dto.setWorkflowId(workflowId);
+        dto.setStatus(execution.getStatus());
+        dto.setStartedAt(execution.getStartedAt());
+        dto.setEndedAt(execution.getEndedAt());
+        return dto;
     }
 
     private WorkflowDto toDto(Workflow workflow) {

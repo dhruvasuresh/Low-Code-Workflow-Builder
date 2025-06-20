@@ -1,0 +1,6 @@
+server:
+  port: 8083
+
+services:
+  workflow-service:
+    url: http://localhost:8082 

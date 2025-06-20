@@ -1,6 +1,7 @@
 package com.lowcode.workflowservice.controller;
 
 import com.lowcode.workflowservice.dto.WorkflowDto;
+import com.lowcode.workflowservice.dto.WorkflowExecutionDto;
 import com.lowcode.workflowservice.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,10 @@ public class WorkflowController {
     public ResponseEntity<Void> deleteWorkflow(@PathVariable Long id) {
         workflowService.deleteWorkflow(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/executions")
+    public ResponseEntity<WorkflowExecutionDto> createWorkflowExecution(@PathVariable Long id) {
+        return ResponseEntity.ok(workflowService.createWorkflowExecution(id));
     }
 } 
