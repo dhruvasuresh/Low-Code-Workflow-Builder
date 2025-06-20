@@ -6,9 +6,12 @@ import com.lowcode.workflowservice.dto.WorkflowDto;
 import com.lowcode.workflowservice.dto.WorkflowExecutionDto;
 import com.lowcode.workflowservice.repository.WorkflowRepository;
 import com.lowcode.workflowservice.repository.WorkflowExecutionRepository;
+import com.lowcode.workflowservice.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +38,8 @@ public class WorkflowService {
     }
 
     public Optional<WorkflowDto> getWorkflowById(Long id) {
-        return workflowRepository.findById(id).map(this::toDto);
+        return workflowRepository.findById(id)
+                .map(this::toDto);
     }
 
     public Optional<WorkflowDto> updateWorkflow(Long id, WorkflowDto dto) {
@@ -54,7 +58,7 @@ public class WorkflowService {
 
     public WorkflowExecutionDto createWorkflowExecution(Long workflowId) {
         Workflow workflow = workflowRepository.findById(workflowId)
-                .orElseThrow(() -> new RuntimeException("Workflow not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Workflow not found"));
         WorkflowExecution execution = WorkflowExecution.builder()
                 .workflow(workflow)
                 .status("PENDING")
@@ -68,6 +72,10 @@ public class WorkflowService {
         dto.setStartedAt(execution.getStartedAt());
         dto.setEndedAt(execution.getEndedAt());
         return dto;
+    }
+
+    public Page<WorkflowDto> getAllWorkflows(Pageable pageable) {
+        return workflowRepository.findAll(pageable).map(this::toDto);
     }
 
     private WorkflowDto toDto(Workflow workflow) {

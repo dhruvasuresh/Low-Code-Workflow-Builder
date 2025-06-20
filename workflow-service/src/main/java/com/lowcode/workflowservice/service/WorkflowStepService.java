@@ -7,6 +7,8 @@ import com.lowcode.workflowservice.repository.WorkflowRepository;
 import com.lowcode.workflowservice.repository.WorkflowStepRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,5 +73,14 @@ public class WorkflowStepService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Page<WorkflowStepDto> listSteps(Long workflowId, Pageable pageable) {
+        return stepRepository.findByWorkflowId(workflowId, pageable)
+                .map(step -> {
+                    WorkflowStepDto dto = new WorkflowStepDto();
+                    BeanUtils.copyProperties(step, dto);
+                    return dto;
+                });
     }
 } 

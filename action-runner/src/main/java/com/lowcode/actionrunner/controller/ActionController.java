@@ -3,7 +3,12 @@ package com.lowcode.actionrunner.controller;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/actions")
@@ -11,10 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class ActionController {
 
     @PostMapping("/execute")
-    public ResponseEntity<String> executeAction(@RequestBody ActionRequest request) {
+    public ResponseEntity<Map<String, Object>> executeAction(@RequestBody ActionRequest request) {
         log.info("Executing action: type={}, config={}", request.getActionType(), request.getConfig());
         // Simulate action execution
-        return ResponseEntity.ok("Action executed: " + request.getActionType());
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("actionType", request.getActionType());
+        response.put("timestamp", LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Data
