@@ -5,6 +5,10 @@ import com.lowcode.workflowservice.domain.WorkflowStep;
 import com.lowcode.workflowservice.dto.WorkflowStepDto;
 import com.lowcode.workflowservice.repository.WorkflowRepository;
 import com.lowcode.workflowservice.repository.WorkflowStepRepository;
+import com.lowcode.workflowservice.domain.StepExecution;
+import com.lowcode.workflowservice.domain.WorkflowExecution;
+import com.lowcode.workflowservice.repository.StepExecutionRepository;
+import com.lowcode.workflowservice.repository.WorkflowExecutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 public class WorkflowStepService {
     private final WorkflowStepRepository stepRepository;
     private final WorkflowRepository workflowRepository;
+    private final StepExecutionRepository stepExecutionRepository;
+    private final WorkflowExecutionRepository workflowExecutionRepository;
 
     public WorkflowStepDto addStep(Long workflowId, WorkflowStepDto dto) {
         if (stepRepository.existsByWorkflowIdAndStepOrder(workflowId, dto.getStepOrder())) {
@@ -71,5 +77,27 @@ public class WorkflowStepService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public StepExecution createStepExecution(Long workflowExecutionId, Long stepId, String status) {
+        WorkflowExecution execution = workflowExecutionRepository.findById(workflowExecutionId)
+                .orElseThrow(() -> new RuntimeException("WorkflowExecution not found"));
+        WorkflowStep step = stepRepository.findById(stepId)
+                .orElseThrow(() -> new RuntimeException("WorkflowStep not found"));
+        StepExecution stepExecution = StepExecution.builder()
+                .workflowExecution(execution)
+                .step(step)
+                .status(status)
+                .retryCount(0)
+                .build();
+        return stepExecutionRepository.save(stepExecution);
+    }
+
+    public StepExecution updateStepExecutionStatus(Long stepExecutionId, String status, String errorLog) {
+        StepExecution stepExecution = stepExecutionRepository.findById(stepExecutionId)
+                .orElseThrow(() -> new RuntimeException("StepExecution not found"));
+        stepExecution.setStatus(status);
+        stepExecution.setErrorLog(errorLog);
+        return stepExecutionRepository.save(stepExecution);
     }
 } 

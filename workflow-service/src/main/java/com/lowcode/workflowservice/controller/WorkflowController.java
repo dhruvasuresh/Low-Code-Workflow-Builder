@@ -56,4 +56,15 @@ public class WorkflowController {
                 .location(URI.create("/workflows/" + id + "/executions/" + created.getId()))
                 .body(created);
     }
+
+    @GetMapping("/{id}/executions")
+    public ResponseEntity<List<WorkflowExecutionDto>> getExecutionsForWorkflow(@PathVariable Long id) {
+        return ResponseEntity.ok(workflowService.getExecutionsForWorkflow(id));
+    }
+
+    @PutMapping("/executions/{executionId}/status")
+    public ResponseEntity<WorkflowExecutionDto> updateWorkflowExecutionStatus(@PathVariable Long executionId, @RequestParam String status) {
+        WorkflowExecutionDto updated = workflowService.updateWorkflowExecutionStatus(executionId, status);
+        return ResponseEntity.ok(updated);
+    }
 } 

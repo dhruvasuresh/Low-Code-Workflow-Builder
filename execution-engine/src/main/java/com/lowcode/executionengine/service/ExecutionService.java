@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +46,10 @@ public class ExecutionService {
         WorkflowExecutionDto execution = response.getBody();
         logger.info("Created WorkflowExecution: {}", execution);
 
+        // 1. Set WorkflowExecution status to IN_PROGRESS
+        String updateExecStatusUrl = workflowServiceUrl + "/workflows/executions/" + execution.getId() + "/status?status=IN_PROGRESS";
+        restTemplate.exchange(updateExecStatusUrl, HttpMethod.PUT, request, Map.class);
+
         // 2. Fetch workflow steps
         String stepsUrl = workflowServiceUrl + "/workflows/" + workflowId + "/steps";
         ResponseEntity<WorkflowStepDto[]> stepsResponse = restTemplate.exchange(
@@ -57,8 +62,26 @@ public class ExecutionService {
         logger.info("Fetched {} steps for workflow {}", steps.size(), workflowId);
 
         // 3. For each step, call action-runner
+        String finalStatus = "COMPLETED";
         for (WorkflowStepDto step : steps) {
             logger.info("Executing step {}: {}", step.getStepOrder(), step.getActionType());
+            // 1. Create StepExecution (IN_PROGRESS)
+            String createStepExecUrl = UriComponentsBuilder.fromHttpUrl(workflowServiceUrl)
+                .path("/workflows/" + workflowId + "/steps/executions")
+                .queryParam("workflowExecutionId", execution.getId())
+                .queryParam("stepId", step.getId())
+                .queryParam("status", "IN_PROGRESS")
+                .toUriString();
+            ResponseEntity<Map> stepExecResponse = restTemplate.exchange(
+                createStepExecUrl,
+                HttpMethod.POST,
+                request,
+                Map.class
+            );
+            Map stepExec = stepExecResponse.getBody();
+            Long stepExecutionId = Long.valueOf(String.valueOf(stepExec.get("id")));
+
+            // 2. Call action-runner
             String actionUrl = actionRunnerUrl + "/actions/execute";
             HttpHeaders actionHeaders = new HttpHeaders();
             actionHeaders.set("Authorization", token);
@@ -68,14 +91,40 @@ public class ExecutionService {
                     "config", step.getConfig()
             );
             HttpEntity<Map<String, Object>> actionEntity = new HttpEntity<>(actionRequest, actionHeaders);
-            ResponseEntity<String> actionResponse = restTemplate.exchange(
-                    actionUrl,
-                    HttpMethod.POST,
-                    actionEntity,
-                    String.class
+            String status = "COMPLETED";
+            String errorLog = null;
+            try {
+                ResponseEntity<String> actionResponse = restTemplate.exchange(
+                        actionUrl,
+                        HttpMethod.POST,
+                        actionEntity,
+                        String.class
+                );
+                logger.info("Action runner response: {}", actionResponse.getBody());
+            } catch (Exception ex) {
+                status = "FAILED";
+                errorLog = ex.getMessage();
+                logger.error("Action runner failed: {}", ex.getMessage());
+                finalStatus = "FAILED";
+            }
+
+            // 3. Update StepExecution status
+            String updateStepExecUrl = UriComponentsBuilder.fromHttpUrl(workflowServiceUrl)
+                .path("/workflows/" + workflowId + "/steps/executions/" + stepExecutionId)
+                .queryParam("status", status)
+                .queryParam("errorLog", errorLog)
+                .toUriString();
+            restTemplate.exchange(
+                updateStepExecUrl,
+                HttpMethod.PUT,
+                request,
+                Map.class
             );
-            logger.info("Action runner response: {}", actionResponse.getBody());
         }
+
+        // 4. Set WorkflowExecution status to COMPLETED or FAILED
+        String endExecStatusUrl = workflowServiceUrl + "/workflows/executions/" + execution.getId() + "/status?status=" + finalStatus;
+        restTemplate.exchange(endExecStatusUrl, HttpMethod.PUT, request, Map.class);
 
         logger.info("Finished execution for workflow: {}", workflowId);
     }

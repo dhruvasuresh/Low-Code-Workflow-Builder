@@ -72,6 +72,39 @@ public class WorkflowService {
         return dto;
     }
 
+    public WorkflowExecutionDto updateWorkflowExecutionStatus(Long executionId, String status) {
+        WorkflowExecution execution = workflowExecutionRepository.findById(executionId)
+                .orElseThrow(() -> new ResourceNotFoundException("WorkflowExecution not found"));
+        execution.setStatus(status);
+        if ("COMPLETED".equalsIgnoreCase(status) || "FAILED".equalsIgnoreCase(status)) {
+            execution.setEndedAt(java.time.LocalDateTime.now());
+        }
+        workflowExecutionRepository.save(execution);
+        WorkflowExecutionDto dto = new WorkflowExecutionDto();
+        dto.setId(execution.getId());
+        dto.setWorkflowId(execution.getWorkflow().getId());
+        dto.setStatus(execution.getStatus());
+        dto.setStartedAt(execution.getStartedAt());
+        dto.setEndedAt(execution.getEndedAt());
+        return dto;
+    }
+
+    public List<WorkflowExecutionDto> getExecutionsForWorkflow(Long workflowId) {
+        List<WorkflowExecution> executions = workflowExecutionRepository.findAll();
+        return executions.stream()
+                .filter(e -> e.getWorkflow().getId().equals(workflowId))
+                .map(e -> {
+                    WorkflowExecutionDto dto = new WorkflowExecutionDto();
+                    dto.setId(e.getId());
+                    dto.setWorkflowId(workflowId);
+                    dto.setStatus(e.getStatus());
+                    dto.setStartedAt(e.getStartedAt());
+                    dto.setEndedAt(e.getEndedAt());
+                    return dto;
+                })
+                .toList();
+    }
+
     private WorkflowDto toDto(Workflow workflow) {
         WorkflowDto dto = new WorkflowDto();
         BeanUtils.copyProperties(workflow, dto);
