@@ -6,7 +6,7 @@ import com.lowcode.userservice.dto.UserLoginRequest;
 import com.lowcode.userservice.dto.UserResponse;
 import com.lowcode.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponse registerUser(UserRegisterRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {

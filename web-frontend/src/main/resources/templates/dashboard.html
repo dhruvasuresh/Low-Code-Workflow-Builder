@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard - Workflows</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<h1>Workflows</h1>
+
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="workflow : ${workflows}">
+        <td th:text="${workflow.id}"></td>
+        <td th:text="${workflow.name}"></td>
+        <td>
+            <!-- Placeholder for future actions (view, execute, etc.) -->
+            <a th:href="@{'/workflow/' + ${workflow.id}}">View</a>
+        </td>
+    </tr>
+    <tr th:if="${workflows == null or #lists.isEmpty(workflows)}">
+        <td colspan="3">No workflows found.</td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/logout">Logout</a>
+</body>
+</html> 
