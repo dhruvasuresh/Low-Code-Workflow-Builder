@@ -17,6 +17,8 @@ public class Workflow {
     private Long id;
 
     private String name;
+    @Column(length = 1024)
+    private String description;
     private Integer version;
     private String createdBy;
     private LocalDateTime createdAt;

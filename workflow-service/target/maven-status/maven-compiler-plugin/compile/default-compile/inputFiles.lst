@@ -9,6 +9,7 @@ C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowco
 C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\domain\WorkflowStep.java
 C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\security\JwtUtil.java
 C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\WorkflowServiceApplication.java
+C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\dto\StepExecutionDto.java
 C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\security\SecurityConfig.java
 C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\domain\WorkflowExecution.java
 C:\Users\User\Desktop\low_code_workflow\workflow-service\src\main\java\com\lowcode\workflowservice\security\JwtAuthenticationFilter.java

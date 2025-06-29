@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.net.URI;
 import java.util.List;
@@ -20,13 +23,33 @@ public class WorkflowController {
 
     @PostMapping
     public ResponseEntity<WorkflowDto> createWorkflow(@RequestBody WorkflowDto dto) {
-        WorkflowDto created = workflowService.createWorkflow(dto);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
+            username = userDetails.getUsername();
+        } else if (authentication != null && authentication.getPrincipal() instanceof String str) {
+            username = str;
+        }
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        WorkflowDto created = workflowService.createWorkflow(dto, username);
         return ResponseEntity.created(URI.create("/workflows/" + created.getId())).body(created);
     }
 
     @GetMapping
     public ResponseEntity<List<WorkflowDto>> getAllWorkflows() {
-        return ResponseEntity.ok(workflowService.getAllWorkflows());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
+            username = userDetails.getUsername();
+        } else if (authentication != null && authentication.getPrincipal() instanceof String str) {
+            username = str;
+        }
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(workflowService.getUserWorkflows(username));
     }
 
     @GetMapping("/{id}")
@@ -66,5 +89,16 @@ public class WorkflowController {
     public ResponseEntity<WorkflowExecutionDto> updateWorkflowExecutionStatus(@PathVariable Long executionId, @RequestParam String status) {
         WorkflowExecutionDto updated = workflowService.updateWorkflowExecutionStatus(executionId, status);
         return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/executions/{executionId}")
+    public ResponseEntity<Void> deleteWorkflowExecution(@PathVariable Long executionId) {
+        workflowService.deleteWorkflowExecution(executionId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/executions")
+    public ResponseEntity<List<WorkflowExecutionDto>> getExecutionsByStatus(@RequestParam String status) {
+        return ResponseEntity.ok(workflowService.getExecutionsByStatus(status));
     }
 } 

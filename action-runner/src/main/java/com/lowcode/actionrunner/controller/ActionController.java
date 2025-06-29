@@ -23,6 +23,13 @@ public class ActionController {
     @PostMapping("/execute")
     public ResponseEntity<Map<String, Object>> executeAction(@RequestBody ActionRequest request) {
         log.info("Executing action: type={}, config={}", request.getActionType(), request.getConfig());
+        if (request.getConfig() == null || !(request.getConfig() instanceof Map)) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("error", "Invalid config: must be a JSON object");
+            error.put("timestamp", LocalDateTime.now());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
         String result = actionService.executeAction(request.getActionType(), request.getConfig());
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");

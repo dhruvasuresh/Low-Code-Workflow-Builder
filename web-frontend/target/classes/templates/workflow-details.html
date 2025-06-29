@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Workflow Details</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header style="background:#222;color:#fff;padding:10px 0 10px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:1.5em;font-weight:bold;">LowCode Workflow</div>
+    <nav>
+        <a href="/dashboard" style="color:#fff;margin-right:20px;">Dashboard</a>
+        <a href="/workflows" style="color:#fff;margin-right:20px;">Workflows</a>
+        <a href="/workflows/create" style="color:#fff;margin-right:20px;">Create Workflow</a>
+        <a href="/logout" style="color:#fff;">Logout</a>
+    </nav>
+    <div style="margin-right:20px;">User: <span th:text="${session.username}">username</span></div>
+</header>
+
+<h1>Workflow Details</h1>
+
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<div th:if="${workflow != null}">
+    <table>
+        <tr><th>ID</th><td th:text="${workflow.id}"></td></tr>
+        <tr><th>Name</th><td th:text="${workflow.name}"></td></tr>
+        <tr><th>Description</th><td th:text="${workflow.description} ?: 'N/A'"></td></tr>
+        <tr><th>Trigger Type</th><td th:text="${workflow.triggerType} ?: 'N/A'"></td></tr>
+        <tr><th>Version</th><td th:text="${workflow.version} ?: 'N/A'"></td></tr>
+        <tr><th>Created By</th><td th:text="${workflow.createdBy} ?: 'N/A'"></td></tr>
+        <tr><th>Created At</th><td th:text="${workflow.createdAt} ?: 'N/A'"></td></tr>
+    </table>
+
+    <div style="margin:20px 0;">
+        <a th:href="@{'/workflow/' + ${workflow.id} + '/edit'}"><button>Edit</button></a>
+        <form th:action="@{'/workflow/' + ${workflow.id} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this workflow?');">
+            <button type="submit" style="background:#d9534f;">Delete</button>
+        </form>
+        <form th:action="@{'/workflow/' + ${workflow.id} + '/executions/run'}" method="post" style="display:inline;">
+            <button type="submit" style="background:#5cb85c;">Run Workflow</button>
+        </form>
+    </div>
+
+    <h2>Steps</h2>
+    <div style="margin-bottom:10px;">
+        <a th:href="@{'/workflow/' + ${workflow.id} + '/steps/add'}"><button>Add Step</button></a>
+    </div>
+    <table th:if="${steps != null && !#lists.isEmpty(steps)}" border="1" cellpadding="8" cellspacing="0">
+        <thead>
+        <tr>
+            <th>Order</th>
+            <th>Action Type</th>
+            <th>Config</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="step : ${steps}">
+            <td th:text="${step.stepOrder}"></td>
+            <td th:text="${step.actionType}"></td>
+            <td th:text="${step.config}"></td>
+            <td>
+                <a th:href="@{'/workflow/' + ${workflow.id} + '/steps/' + ${step.id} + '/edit'}"><button>Edit</button></a>
+                <form th:action="@{'/workflow/' + ${workflow.id} + '/steps/' + ${step.id} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this step?');">
+                    <button type="submit" style="background:#d9534f;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${steps == null or #lists.isEmpty(steps)}">No steps defined yet.</div>
+
+    <h2>Executions</h2>
+    <table th:if="${executions != null && !#lists.isEmpty(executions)}" border="1" cellpadding="8" cellspacing="0">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Started At</th>
+            <th>Ended At</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="exec : ${executions}">
+            <td th:text="${exec.id}"></td>
+            <td th:text="${exec.status}"></td>
+            <td th:text="${exec.startedAt}"></td>
+            <td th:text="${exec.endedAt}"></td>
+            <td>
+                <a th:href="@{'/workflow/' + ${workflow.id} + '/executions/' + ${exec.id}}"><button>View Details</button></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${executions == null or #lists.isEmpty(executions)}">No executions yet.</div>
+</div>
+
+</body>
+</html> 

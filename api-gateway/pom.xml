@@ -20,6 +20,11 @@
             <version>1.18.32</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+    <groupId>com.lowcode</groupId>
+    <artifactId>common</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
     </dependencies>
     <build>
         <plugins>

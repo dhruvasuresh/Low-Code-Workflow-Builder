@@ -1,2 +1,15 @@
 server:
   port: 8084 
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dhruvasuresh2004@gmail.com  # <-- Replace with your Gmail address
+    password: vrjhyrkgllfhopmw       # <-- Replace with your Gmail App Password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true 

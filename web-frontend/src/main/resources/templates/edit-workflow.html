@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Workflow</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header style="background:#222;color:#fff;padding:10px 0 10px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:1.5em;font-weight:bold;">LowCode Workflow</div>
+    <nav>
+        <a href="/dashboard" style="color:#fff;margin-right:20px;">Dashboard</a>
+        <a href="/workflows" style="color:#fff;margin-right:20px;">Workflows</a>
+        <a href="/workflows/create" style="color:#fff;margin-right:20px;">Create Workflow</a>
+        <a href="/logout" style="color:#fff;">Logout</a>
+    </nav>
+    <div style="margin-right:20px;">User: <span th:text="${session.username}">username</span></div>
+</header>
+
+<h1>Edit Workflow</h1>
+
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<form th:action="@{'/workflow/' + ${workflow.id} + '/edit'}" method="post" style="max-width:400px;margin:30px auto;">
+    <label for="name">Workflow Name:</label><br>
+    <input type="text" id="name" name="name" th:value="${workflow.name}" required><br><br>
+    <label for="description">Description:</label><br>
+    <textarea id="description" name="description" rows="3" style="width:100%;" th:text="${workflow.description}"></textarea><br><br>
+    <label for="triggerType">Trigger Type:</label><br>
+    <select id="triggerType" name="triggerType" required>
+        <option value="">--Select--</option>
+        <option value="manual" th:selected="${workflow.triggerType} == 'manual'">Manual</option>
+        <option value="schedule" th:selected="${workflow.triggerType} == 'schedule'">Schedule</option>
+        <option value="event" th:selected="${workflow.triggerType} == 'event'">Event</option>
+    </select><br><br>
+    <button type="submit">Save Changes</button>
+</form>
+
+</body>
+</html> 

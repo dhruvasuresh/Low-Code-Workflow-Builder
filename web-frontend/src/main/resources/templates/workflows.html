@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Workflows</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header style="background:#222;color:#fff;padding:10px 0 10px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:1.5em;font-weight:bold;">LowCode Workflow</div>
+    <nav>
+        <a href="/dashboard" style="color:#fff;margin-right:20px;">Dashboard</a>
+        <a href="/workflows" style="color:#fff;margin-right:20px;">Workflows</a>
+        <a href="/workflows/create" style="color:#fff;margin-right:20px;">Create Workflow</a>
+        <a href="/logout" style="color:#fff;">Logout</a>
+    </nav>
+    <div style="margin-right:20px;">User: <span th:text="${session.username}">username</span></div>
+</header>
+
+<h1>All Workflows</h1>
+
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<div style="margin-bottom:20px;">
+    <a href="/workflows/create"><button>Create New Workflow</button></a>
+</div>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="workflow : ${workflows}">
+        <td th:text="${workflow.id}"></td>
+        <td th:text="${workflow.name}"></td>
+        <td th:text="${workflow.containsKey('status')} ? ${workflow['status']} : 'N/A'"></td>
+        <td th:text="${workflow.containsKey('createdAt')} ? ${workflow['createdAt']} : 'N/A'"></td>
+        <td>
+            <a th:href="@{'/workflow/' + ${workflow.id}}">View</a>
+            <!-- Future: Edit, Delete, Execute -->
+        </td>
+    </tr>
+    <tr th:if="${workflows == null or #lists.isEmpty(workflows)}">
+        <td colspan="5">No workflows found.</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html> 

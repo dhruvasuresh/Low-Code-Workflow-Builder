@@ -12,6 +12,7 @@ import com.lowcode.workflowservice.repository.WorkflowExecutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import com.lowcode.common.dto.StepExecutionDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +80,7 @@ public class WorkflowStepService {
                 .collect(Collectors.toList());
     }
 
-    public StepExecution createStepExecution(Long workflowExecutionId, Long stepId, String status) {
+    public StepExecutionDto createStepExecution(Long workflowExecutionId, Long stepId, String status) {
         WorkflowExecution execution = workflowExecutionRepository.findById(workflowExecutionId)
                 .orElseThrow(() -> new RuntimeException("WorkflowExecution not found"));
         WorkflowStep step = stepRepository.findById(stepId)
@@ -90,7 +91,19 @@ public class WorkflowStepService {
                 .status(status)
                 .retryCount(0)
                 .build();
-        return stepExecutionRepository.save(stepExecution);
+        stepExecution = stepExecutionRepository.save(stepExecution);
+        return toDto(stepExecution);
+    }
+
+    public StepExecutionDto toDto(StepExecution stepExecution) {
+        StepExecutionDto dto = new StepExecutionDto();
+        dto.setId(stepExecution.getId());
+        dto.setWorkflowExecutionId(stepExecution.getWorkflowExecution() != null ? stepExecution.getWorkflowExecution().getId() : null);
+        dto.setStepId(stepExecution.getStep() != null ? stepExecution.getStep().getId() : null);
+        dto.setStatus(stepExecution.getStatus());
+        dto.setErrorLog(stepExecution.getErrorLog());
+        dto.setRetryCount(stepExecution.getRetryCount());
+        return dto;
     }
 
     public StepExecution updateStepExecutionStatus(Long stepExecutionId, String status, String errorLog) {
@@ -99,5 +112,15 @@ public class WorkflowStepService {
         stepExecution.setStatus(status);
         stepExecution.setErrorLog(errorLog);
         return stepExecutionRepository.save(stepExecution);
+    }
+
+    public WorkflowStepDto getStepById(Long workflowId, Long stepId) {
+        Optional<WorkflowStep> stepOpt = stepRepository.findById(stepId);
+        if (stepOpt.isEmpty()) return null;
+        WorkflowStep step = stepOpt.get();
+        if (!step.getWorkflow().getId().equals(workflowId)) return null;
+        WorkflowStepDto dto = new WorkflowStepDto();
+        BeanUtils.copyProperties(step, dto);
+        return dto;
     }
 } 

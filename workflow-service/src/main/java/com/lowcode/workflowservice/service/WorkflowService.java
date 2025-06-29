@@ -6,6 +6,7 @@ import com.lowcode.workflowservice.dto.WorkflowDto;
 import com.lowcode.workflowservice.dto.WorkflowExecutionDto;
 import com.lowcode.workflowservice.repository.WorkflowRepository;
 import com.lowcode.workflowservice.repository.WorkflowExecutionRepository;
+import com.lowcode.workflowservice.repository.StepExecutionRepository;
 import com.lowcode.workflowservice.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -21,18 +22,25 @@ import java.util.stream.Collectors;
 public class WorkflowService {
     private final WorkflowRepository workflowRepository;
     private final WorkflowExecutionRepository workflowExecutionRepository;
+    private final StepExecutionRepository stepExecutionRepository;
 
-    public WorkflowDto createWorkflow(WorkflowDto dto) {
+    public WorkflowDto createWorkflow(WorkflowDto dto, String username) {
         Workflow workflow = new Workflow();
         BeanUtils.copyProperties(dto, workflow);
         workflow.setCreatedAt(LocalDateTime.now());
         workflow.setVersion(1);
+        workflow.setCreatedBy(username);
+        workflow.setDescription(dto.getDescription());
         Workflow saved = workflowRepository.save(workflow);
         return toDto(saved);
     }
 
     public List<WorkflowDto> getAllWorkflows() {
         return workflowRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    public List<WorkflowDto> getUserWorkflows(String username) {
+        return workflowRepository.findByCreatedBy(username).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public Optional<WorkflowDto> getWorkflowById(Long id) {
@@ -45,6 +53,7 @@ public class WorkflowService {
             existing.setName(dto.getName());
             existing.setTriggerType(dto.getTriggerType());
             existing.setVersion(existing.getVersion() + 1);
+            existing.setDescription(dto.getDescription());
             Workflow updated = workflowRepository.save(existing);
             return toDto(updated);
         });
@@ -105,9 +114,31 @@ public class WorkflowService {
                 .toList();
     }
 
+    public void deleteWorkflowExecution(Long executionId) {
+        stepExecutionRepository.deleteByWorkflowExecutionId(executionId);
+        workflowExecutionRepository.deleteById(executionId);
+    }
+
+    public List<WorkflowExecutionDto> getExecutionsByStatus(String status) {
+        List<WorkflowExecution> executions = workflowExecutionRepository.findAll();
+        return executions.stream()
+                .filter(e -> e.getStatus().equalsIgnoreCase(status))
+                .map(e -> {
+                    WorkflowExecutionDto dto = new WorkflowExecutionDto();
+                    dto.setId(e.getId());
+                    dto.setWorkflowId(e.getWorkflow().getId());
+                    dto.setStatus(e.getStatus());
+                    dto.setStartedAt(e.getStartedAt());
+                    dto.setEndedAt(e.getEndedAt());
+                    return dto;
+                })
+                .toList();
+    }
+
     private WorkflowDto toDto(Workflow workflow) {
         WorkflowDto dto = new WorkflowDto();
         BeanUtils.copyProperties(workflow, dto);
+        dto.setDescription(workflow.getDescription());
         return dto;
     }
 } 

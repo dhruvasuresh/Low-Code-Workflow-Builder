@@ -22,5 +22,6 @@ com\lowcode\workflowservice\security\JwtUtil.class
 com\lowcode\workflowservice\service\WorkflowStepService.class
 com\lowcode\workflowservice\domain\StepExecution.class
 com\lowcode\workflowservice\domain\WorkflowStep.class
+com\lowcode\workflowservice\dto\StepExecutionDto.class
 com\lowcode\workflowservice\service\WorkflowService.class
 com\lowcode\workflowservice\exception\ResourceNotFoundException.class

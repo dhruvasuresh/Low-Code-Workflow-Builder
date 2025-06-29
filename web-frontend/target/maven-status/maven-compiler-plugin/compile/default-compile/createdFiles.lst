@@ -1,4 +1,5 @@
-com\lowcode\webfrontend\controller\AuthController.class
 com\lowcode\webfrontend\WebFrontendConfig.class
 com\lowcode\webfrontend\WebFrontendApplication.class
+com\lowcode\webfrontend\controller\AuthController.class
+com\lowcode\webfrontend\controller\WorkflowController.class
 com\lowcode\webfrontend\controller\DashboardController.class

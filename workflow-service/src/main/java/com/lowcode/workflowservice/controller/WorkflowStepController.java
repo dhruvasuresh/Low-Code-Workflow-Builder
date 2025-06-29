@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import com.lowcode.workflowservice.domain.StepExecution;
 import com.lowcode.workflowservice.repository.StepExecutionRepository;
+import com.lowcode.common.dto.StepExecutionDto;
 
 import java.net.URI;
 import java.util.List;
@@ -43,15 +44,16 @@ public class WorkflowStepController {
     }
 
     @PostMapping("/executions")
-    public ResponseEntity<StepExecution> createStepExecution(@RequestParam Long workflowExecutionId, @RequestParam Long stepId, @RequestParam String status) {
-        StepExecution created = stepService.createStepExecution(workflowExecutionId, stepId, status);
+    public ResponseEntity<StepExecutionDto> createStepExecution(@RequestParam Long workflowExecutionId, @RequestParam Long stepId, @RequestParam String status) {
+        StepExecutionDto created = stepService.createStepExecution(workflowExecutionId, stepId, status);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/executions/{stepExecutionId}")
-    public ResponseEntity<StepExecution> updateStepExecutionStatus(@PathVariable Long stepExecutionId, @RequestParam String status, @RequestParam(required = false) String errorLog) {
+    public ResponseEntity<StepExecutionDto> updateStepExecutionStatus(@PathVariable Long stepExecutionId, @RequestParam String status, @RequestParam(required = false) String errorLog) {
         StepExecution updated = stepService.updateStepExecutionStatus(stepExecutionId, status, errorLog);
-        return ResponseEntity.ok(updated);
+        StepExecutionDto dto = stepService.toDto(updated);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/executions/by-execution/{workflowExecutionId}")
@@ -61,5 +63,14 @@ public class WorkflowStepController {
             .filter(se -> se.getWorkflowExecution().getId().equals(workflowExecutionId))
             .toList();
         return ResponseEntity.ok(steps);
+    }
+
+    @GetMapping("/{stepId}")
+    public ResponseEntity<WorkflowStepDto> getStepById(@PathVariable Long workflowId, @PathVariable Long stepId) {
+        WorkflowStepDto step = stepService.getStepById(workflowId, stepId);
+        if (step == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(step);
     }
 } 

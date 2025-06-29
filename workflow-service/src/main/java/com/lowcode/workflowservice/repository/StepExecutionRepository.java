@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StepExecutionRepository extends JpaRepository<StepExecution, Long> {
+    void deleteByWorkflowExecutionId(Long workflowExecutionId);
 } 

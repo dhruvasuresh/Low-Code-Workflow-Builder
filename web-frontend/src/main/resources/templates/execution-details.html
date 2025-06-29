@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Execution Details</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header style="background:#222;color:#fff;padding:10px 0 10px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:1.5em;font-weight:bold;">LowCode Workflow</div>
+    <nav>
+        <a href="/dashboard" style="color:#fff;margin-right:20px;">Dashboard</a>
+        <a href="/workflows" style="color:#fff;margin-right:20px;">Workflows</a>
+        <a href="/workflows/create" style="color:#fff;margin-right:20px;">Create Workflow</a>
+        <a href="/logout" style="color:#fff;">Logout</a>
+    </nav>
+    <div style="margin-right:20px;">User: <span th:text="${session.username}">username</span></div>
+</header>
+
+<h1>Execution Details</h1>
+
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<div th:if="${execution != null}">
+    <table>
+        <tr><th>ID</th><td th:text="${execution.id}"></td></tr>
+        <tr><th>Status</th><td th:text="${execution.status}"></td></tr>
+        <tr><th>Started At</th><td th:text="${execution.startedAt}"></td></tr>
+        <tr><th>Ended At</th><td th:text="${execution.endedAt}"></td></tr>
+    </table>
+
+    <h2>Step Executions</h2>
+    <table th:if="${stepExecutions != null && !#lists.isEmpty(stepExecutions)}" border="1" cellpadding="8" cellspacing="0">
+        <thead>
+        <tr>
+            <th>Step Order</th>
+            <th>Action Type</th>
+            <th>Status</th>
+            <th>Error Log</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="step : ${stepExecutions}">
+            <td th:text="${step.step.stepOrder}"></td>
+            <td th:text="${step.step.actionType}"></td>
+            <td th:text="${step.status}"></td>
+            <td th:text="${step.errorLog}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${stepExecutions == null or #lists.isEmpty(stepExecutions)}">No step executions yet.</div>
+</div>
+
+<a th:href="@{'/workflow/' + ${workflowId}}"><button>Back to Workflow</button></a>
+<form th:action="@{'/workflow/' + ${workflowId} + '/executions/' + ${execution.id} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to stop and delete this execution?');">
+    <button type="submit" style="background:#d9534f;">Stop/Delete Execution</button>
+</form>
+
+</body>
+</html> 

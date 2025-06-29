@@ -4,3 +4,7 @@ server:
 services:
   workflow-service:
     url: http://localhost:8082 
+
+service-user:
+  email: system@workflow.local
+  password: system_password_123 

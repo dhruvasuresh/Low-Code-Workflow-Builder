@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Step</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header style="background:#222;color:#fff;padding:10px 0 10px 20px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-size:1.5em;font-weight:bold;">LowCode Workflow</div>
+    <nav>
+        <a href="/dashboard" style="color:#fff;margin-right:20px;">Dashboard</a>
+        <a href="/workflows" style="color:#fff;margin-right:20px;">Workflows</a>
+        <a href="/workflows/create" style="color:#fff;margin-right:20px;">Create Workflow</a>
+        <a href="/logout" style="color:#fff;">Logout</a>
+    </nav>
+    <div style="margin-right:20px;">User: <span th:text="${session.username}">username</span></div>
+</header>
+
+<h1>Edit Step</h1>
+
+<div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+<form th:action="@{'/workflow/' + ${workflowId} + '/steps/' + ${step.id} + '/edit'}" method="post" style="max-width:400px;margin:30px auto;">
+    <label for="stepOrder">Step Order:</label><br>
+    <input type="number" id="stepOrder" name="stepOrder" min="1" required th:value="${step.stepOrder}"><br><br>
+    <label for="actionType">Action Type:</label><br>
+    <select id="actionType" name="actionType" required>
+        <option value="">--Select--</option>
+        <option value="email" th:selected="${step.actionType == 'email'}">Email</option>
+        <option value="http" th:selected="${step.actionType == 'http'}">HTTP Request</option>
+        <option value="log" th:selected="${step.actionType == 'log'}">Log Message</option>
+    </select><br><br>
+    <label for="config">Config (JSON):</label><br>
+    <textarea id="config" name="config" rows="4" style="width:100%;" th:text="${step.config}"></textarea><br><br>
+    <button type="submit">Update Step</button>
+</form>
+
+</body>
+</html> 

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public class WorkflowDto {
     private Long id;
     private String name;
+    private String description;
     private Integer version;
     private String createdBy;
     private LocalDateTime createdAt;
